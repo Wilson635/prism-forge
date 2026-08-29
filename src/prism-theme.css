@@ -476,12 +476,19 @@ h1, h2, h3, p {
     letter-spacing: .08em
 }
 
-.trust-strip div {
-    display: flex;
-    gap: 42px;
+.trust-strip span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     color: #85928a;
     text-transform: none;
-    font: 600 14px Manrope
+    font: 600 14px Manrope;
+    line-height: 1
+}
+
+.trust-strip span svg {
+    display: block;
+    flex-shrink: 0
 }
 
 .section {
@@ -1549,11 +1556,13 @@ h1, h2, h3, p {
         text-align: center
     }
 
-    .trust-strip div {
-        justify-content: center;
-        gap: 12px;
+    .trust-strip {
         flex-wrap: wrap;
-        margin-top: 16px
+        gap: 20px 12px
+    }
+
+    .trust-strip span {
+        justify-content: center
     }
 
     .section {

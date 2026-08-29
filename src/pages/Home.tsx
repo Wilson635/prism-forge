@@ -1,11 +1,14 @@
-import {ArrowUpRight, Check, Code2, Copy, Grid2X2, Layers3, User, Zap} from 'lucide-react';
+  import {ArrowUpRight, Check, Code2, Copy, Grid2X2, Layers3, User, Zap} from 'lucide-react';
 import {Link} from 'wouter';
 import {blocks, kits, templates} from '@/data/data';
 import {Logo, Nav} from '@/components/Brand';
 import {MiniPreview} from '@/components/Previews';
 import {SectionIntro} from '@/components/SectionIntro';
 import { SlSocialGithub } from "react-icons/sl";
-import { RiLinkedinLine } from "react-icons/ri";
+import { RiLinkedinLine, RiTailwindCssFill  } from "react-icons/ri";
+import { FaReact } from "react-icons/fa";
+import { SiNextdotjs, SiAstro  } from "react-icons/si";
+import { CgFramer } from "react-icons/cg";
 
 export function Home() {
     return <><Nav/>
@@ -48,8 +51,12 @@ export function Home() {
                     <div className="float-tag tag-two"><span className="pulse-dot"/> 48 components</div>
                 </div>
             </section>
-            <section className="trust-strip"><span>Made for modern stacks</span>
-                <div><b>React</b><b>Tailwind CSS</b><b>Next.js</b><b>Framer</b><b>Astro</b></div>
+            <section className="trust-strip">
+              <span>React <FaReact size={25} /></span>
+              <span>Next.js <SiNextdotjs size={25} /></span>
+              <span>Tailwind <RiTailwindCssFill size={25} /></span>
+              <span>Framer <CgFramer size={25} /></span>
+              <span>Astro <SiAstro size={25} /></span>
             </section>
             <section className="section page-grid categories"><SectionIntro eyebrow="The library"
                                                                             title="Everything you need to ship beautifully."><Link
