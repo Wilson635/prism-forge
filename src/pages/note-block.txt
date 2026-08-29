@@ -1,0 +1,88 @@
+import {useMemo, useState} from 'react';
+import {ArrowUpRight, ChevronDown, Grid2X2, Layers3, Search, Sparkles} from 'lucide-react';
+import {Link} from 'wouter';
+import {blocks} from '../data';
+import {Logo, Nav} from '../components/Brand';
+import {InlineBlock} from '../components/InlineBlock';
+
+export function BlocksPage() {
+    const [activeCategory, setActiveCategory] = useState('Marketing');
+    const [active, setActive] = useState('Feature Sections');
+    const [query, setQuery] = useState('');
+    const [expanded, setExpanded] = useState<Record<string, boolean>>({
+        Marketing: true,
+        'Application UI': true,
+        Ecommerce: true
+    });
+    const groups = [{
+        name: 'Marketing',
+        children: ['Hero Sections', 'Feature Sections', 'CTA Sections', 'Bento Grids', 'Pricing Sections', 'Header Sections', 'Newsletter Sections', 'Testimonials', 'Blog Sections']
+    }, {
+        name: 'Application UI',
+        children: ['Navbars', 'Sidebars', 'Command Palettes', 'Tables', 'Forms']
+    }, {name: 'Ecommerce', children: ['Product Overviews', 'Product Lists', 'Shopping Carts', 'Checkout Forms']}];
+    const sectionMap: Record<string, string[]> = {
+        'Hero Sections': ['hero', 'bento', 'cta'],
+        'Feature Sections': ['bento', 'hero', 'stats'],
+        'CTA Sections': ['cta', 'hero', 'form'],
+        'Bento Grids': ['bento', 'stats', 'cta'],
+        'Pricing Sections': ['pricing', 'stats', 'cta'],
+        'Header Sections': ['hero', 'cta', 'form'],
+        'Newsletter Sections': ['form', 'cta', 'stats'],
+        Testimonials: ['hero', 'cta', 'bento'],
+        'Blog Sections': ['bento', 'stats', 'cta'],
+        Navbars: ['hero', 'form', 'cta'],
+        Sidebars: ['stats', 'bento', 'form'],
+        'Command Palettes': ['form', 'stats', 'hero'],
+        Tables: ['stats', 'bento', 'form'],
+        Forms: ['form', 'cta', 'hero'],
+        'Product Overviews': ['hero', 'bento', 'stats'],
+        'Product Lists': ['bento', 'stats', 'form'],
+        'Shopping Carts': ['pricing', 'form', 'cta'],
+        'Checkout Forms': ['form', 'pricing', 'cta']
+    };
+    const selectedBlocks = useMemo(() => blocks.filter(b => (sectionMap[active] ?? blocks.map(item => item.id)).includes(b.id) && b.name.toLowerCase().includes(query.toLowerCase())), [active, query]);
+    const toggleCategory = (name: string) => {
+        setActiveCategory(name);
+        setExpanded(current => ({...current, [name]: !current[name]}));
+    };
+    return <><Nav/>
+        <main className="blocks-browser">
+            <aside className="blocks-sidebar">
+                <div className="sidebar-brand"><Logo/></div>
+                <div className="sidebar-scroll [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"><span className="sidebar-kicker">Library</span>{groups.map(group => <div
+                    className="sidebar-group" key={group.name}>
+                    <button onClick={() => toggleCategory(group.name)}
+                            className={`sidebar-parent ${activeCategory === group.name ? 'category-active' : ''}`}
+                            aria-expanded={expanded[group.name]}
+                            data-testid={`button-category-${group.name.toLowerCase().replace(' ', '-')}`}>
+                        <span>{group.name === 'Marketing' ? <Sparkles size={14}/> : group.name === 'Application UI' ?
+                            <Grid2X2 size={14}/> : <Layers3 size={14}/>}{group.name}</span><ChevronDown
+                        className={expanded[group.name] ? 'chevron-open' : ''} size={13}/></button>
+                    {expanded[group.name] && group.children.map(child => <button key={child} onClick={() => {
+                        setActiveCategory(group.name);
+                        setActive(child);
+                    }} className={`sidebar-child ${active === child ? 'selected' : ''}`}
+                                                                                 data-testid={`button-subcategory-${child.toLowerCase().replaceAll(' ', '-')}`}>{child}<span>{active === child ? '●' : ''}</span>
+                    </button>)}</div>)}</div>
+                <div className="sidebar-promo"><span className="eyebrow">PRISM+ access</span><strong>Build less.<br/>Make
+                    more.</strong><Link href="/kits" data-testid="link-sidebar-kits">Explore kits <ArrowUpRight
+                    size={13}/></Link></div>
+            </aside>
+            <section className="blocks-main">
+                <div className="blocks-page-head">
+                    <div><span className="eyebrow">UI Blocks / {activeCategory} / Page sections</span><h1>{active}</h1>
+                        <p>Use these thoughtfully crafted examples to highlight the most important parts of your
+                            product. Built with real-world layouts and ready to make your own.</p></div>
+                    <label className="browser-search"><Search size={15}/><input value={query}
+                                                                                onChange={e => setQuery(e.target.value)}
+                                                                                placeholder="Search blocks..."
+                                                                                data-testid="input-search-blocks"/></label>
+                </div>
+                <div className="inline-block-list">{selectedBlocks.map(block => <InlineBlock block={block}
+                                                                                             key={block.id}/>)}</div>
+                {selectedBlocks.length === 0 &&
+                    <div className="empty-blocks">No blocks found. Try another search.</div>}</section>
+        </main>
+    </>;
+}
