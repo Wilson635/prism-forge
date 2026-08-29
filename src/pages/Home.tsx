@@ -1,9 +1,11 @@
-import {ArrowUpRight, Check, Code2, Copy, Grid2X2, Layers3, Sparkles, Zap} from 'lucide-react';
+import {ArrowUpRight, Check, Code2, Copy, Grid2X2, Layers3, User, Zap} from 'lucide-react';
 import {Link} from 'wouter';
 import {blocks, kits, templates} from '@/data/data';
 import {Logo, Nav} from '@/components/Brand';
 import {MiniPreview} from '@/components/Previews';
 import {SectionIntro} from '@/components/SectionIntro';
+import { SlSocialGithub } from "react-icons/sl";
+import { RiLinkedinLine } from "react-icons/ri";
 
 export function Home() {
     return <><Nav/>
@@ -122,20 +124,67 @@ export function Home() {
         <Footer/></>;
 }
 
+
+/**
+ * lucide-react n'a pas de logo "X" à jour (son icône "Twitter" est l'ancien
+ * oiseau) — on dessine le glyphe X à la main pour rester fidèle au style
+ * des autres réseaux.
+ */
+function XIcon({size = 14}: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path
+        d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+    </svg>
+  );
+}
+
 export function Footer() {
-    return <footer className="footer page-grid">
-        <div className="footer-top">
-            <div><Logo/><p>The frontend archive<br/>for people who care.</p></div>
-            <div className="footer-links">
-                <div><span>Explore</span><Link href="/blocks">UI Blocks</Link><Link
-                    href="/templates">Templates</Link><Link href="/kits">Kits</Link></div>
-                <div><span>Resources</span><a href="#pricing">Pricing</a><a href="#pricing">Changelog</a><a
-                    href="#pricing">License</a></div>
-                <div><span>Say hello</span><a href="mailto:hello@prism.tools">Email us</a><a href="#pricing">Twitter /
-                    X</a><a href="#pricing">GitHub</a></div>
-            </div>
+  return <footer className="footer">
+    <div className="footer-top page-grid">
+      <div className="footer-meta">
+        <Logo/>
+        <p>The frontend archive<br/>for people who care.</p>
+        <div className="footer-socials">
+          <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="X (Twitter)"
+             data-testid="link-social-x"><XIcon/></a>
+          <a href="https://github.com//wilson635" target="_blank" rel="noreferrer" aria-label="GitHub"
+             data-testid="link-social-github"><SlSocialGithub size={14}/></a>
+          <a href="https://www.linkedin.com/in/wilson-ngahemeni/" target="_blank" rel="noreferrer" aria-label="LinkedIn"
+             data-testid="link-social-linkedin"><RiLinkedinLine size={14}/></a>
+          {/*<a href="https://youtube.com" target="_blank" rel="noreferrer" aria-label="YouTube"
+             data-testid="link-social-youtube"><CiYoutube size={14}/></a>*/}
         </div>
-        <div className="footer-bottom"><span>© 2026 PRISM Studio</span><span>Built with intention <Sparkles size={13}/></span>
+        <div className="footer-status" data-testid="status-systems">
+          <span className="pulse-dot"/> All systems operational
         </div>
-    </footer>;
+      </div>
+      <div className="footer-links">
+        <div>
+          <span>Explore</span>
+          <Link href="/blocks" data-testid="link-footer-blocks">UI Blocks</Link>
+          <Link href="/templates" data-testid="link-footer-templates">Templates</Link>
+          <Link href="/kits" data-testid="link-footer-kits">Kits</Link>
+        </div>
+        <div>
+          <span>Resources</span>
+          <a href="#pricing" data-testid="link-footer-pricing">Pricing</a>
+          <a href="#pricing" data-testid="link-footer-changelog">Changelog</a>
+          <a href="#pricing" data-testid="link-footer-license">License</a>
+        </div>
+        <div>
+          <span>Say hello</span>
+          <a href="mailto:hello@prism.tools" data-testid="link-footer-email">Email us</a>
+          <a href="https://twitter.com" target="_blank" rel="noreferrer"
+             data-testid="link-footer-twitter">Twitter / X</a>
+          <a href="https://github.com" target="_blank" rel="noreferrer"
+             data-testid="link-footer-github">GitHub</a>
+        </div>
+      </div>
+    </div>
+    <div className="footer-bottom page-grid">
+      <span>© 2026 PRISM Studio</span>
+      <span>Built by nwilson <User size={13}/></span>
+    </div>
+  </footer>;
 }

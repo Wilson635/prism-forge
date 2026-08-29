@@ -987,13 +987,14 @@ h1, h2, h3, p {
 }
 
 .footer {
-    padding-top: 80px;
-    padding-bottom: 25px
+    padding-bottom: 25px;
+    overflow: hidden
 }
 
 .footer-top {
     display: flex;
     justify-content: space-between;
+    padding-top: 60px;
     padding-bottom: 75px
 }
 
@@ -1044,6 +1045,101 @@ h1, h2, h3, p {
     display: flex;
     align-items: center;
     gap: 7px
+}
+
+.footer-wordmark {
+    position: relative;
+    height: 240px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
+    pointer-events: none;
+    user-select: none
+}
+
+.footer-wordmark:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--green) 50%, transparent);
+    box-shadow: 0 0 24px 2px rgba(121, 242, 176, .55);
+    z-index: 2
+}
+
+.footer-wordmark:after {
+    content: "";
+    position: absolute;
+    top: -60px;
+    left: 50%;
+    width: 520px;
+    height: 180px;
+    background: radial-gradient(ellipse at center, rgba(121, 242, 176, .16), transparent 70%);
+    transform: translateX(-50%);
+    z-index: 1
+}
+
+.footer-wordmark span {
+    position: relative;
+    font-size: clamp(110px, 15vw, 240px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -.04em;
+    color: rgba(121, 242, 176, .07);
+    transform: translateY(-18%);
+    white-space: nowrap;
+    z-index: 0
+}
+
+.footer-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 22px
+}
+
+.footer-meta p {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.7;
+    margin: 0
+}
+
+.footer-socials {
+    display: flex;
+    gap: 8px
+}
+
+.footer-socials a {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 100%;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    transition: .2s
+}
+
+.footer-socials a:hover {
+    color: var(--bg);
+    background: var(--green);
+    border-color: var(--green)
+}
+
+.footer-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    padding: 7px 12px;
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    font: 10px 'DM Mono';
+    color: var(--muted)
 }
 
 .library-page, .templates-page, .kits-page {
@@ -1508,9 +1604,22 @@ h1, h2, h3, p {
         margin-bottom: 35px
     }
 
+    .footer-wordmark {
+        height: 100px
+    }
+
+    .footer-wordmark span {
+        font-size: clamp(80px, 32vw, 190px)
+    }
+
     .footer-top {
         display: block;
+        padding-top: 40px;
         padding-bottom: 50px
+    }
+
+    .footer-meta {
+        margin-bottom: 40px
     }
 
     .footer-links {
