@@ -1,7 +1,7 @@
 import {ArrowUpRight} from 'lucide-react';
 import {Link} from 'wouter';
 import previewOne from '@/assets/image_1784103674192.png';
-import {templates} from '@/data/data';
+import {templates} from '@/catalog';
 import {Nav} from '@/components/Brand';
 import {Footer} from './Home';
 

@@ -1,6 +1,6 @@
 import {ArrowUpRight} from 'lucide-react';
 import {Link} from 'wouter';
-import {kits} from '@/data/data';
+import {kits} from '@/catalog';
 import {Nav} from '@/components/Brand';
 import {MiniPreview} from '@/components/Previews';
 import {Footer} from './Home';

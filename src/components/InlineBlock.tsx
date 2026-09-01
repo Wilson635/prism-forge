@@ -11,7 +11,7 @@ import * as prettier from 'prettier/standalone';
 import * as prettierPluginBabel from 'prettier/plugins/babel';
 import * as prettierPluginEstree from 'prettier/plugins/estree';
 import * as prettierPluginHtml from 'prettier/plugins/html';
-import type {Block} from '@/data/data';
+import type {Block} from '@/catalog';
 import {RealBlockPreview} from './Previews';
 
 type CodeLanguage = 'react' | 'html';

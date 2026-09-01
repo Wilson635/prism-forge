@@ -4,7 +4,7 @@ import * as Babel from '@babel/standalone';
 import * as LucideIcons from 'lucide-react';
 import * as FramerMotion from 'framer-motion';
 import {ArrowUpRight, Check, ChevronDown, Sparkles} from 'lucide-react';
-import type {Block, PreviewTone} from '@/data/data';
+import type {Block, PreviewTone} from '@/catalog';
 
 
 

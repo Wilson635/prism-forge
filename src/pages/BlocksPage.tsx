@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 import { ArrowUpRight, ChevronDown, Grid2X2, Layers3, Search, Sparkles, SwatchBook } from 'lucide-react';
 import { Link } from 'wouter';
-import { blocks } from '@/data/data';
-import type { Block } from '@/data/data';
+import { blocks } from '@/catalog';
+import type { Block } from '@/catalog';
 import {Logo, NavBlock} from '@/components/Brand';
 import { InlineBlock } from '@/components/InlineBlock';
 
@@ -66,7 +66,7 @@ const CATEGORY_GROUPS: CategoryGroup[] = [
 
 // Flat "section name -> block ids" lookup, derived once from CATEGORY_GROUPS
 // by matching each block's `category` field. Recomputing this instead of
-// hand-listing ids means a brand-new block in data.ts is picked up
+// hand-listing ids means a brand-new block in the catalog is picked up
 // automatically as soon as its `category` matches a section — nothing in
 // this file needs to change.
 const SECTION_BLOCK_IDS: Record<string, BlockId[]> = Object.fromEntries(
