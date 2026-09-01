@@ -34,6 +34,8 @@ export type Block = {
   tone: PreviewTone
   icon: LucideIcon
   code: string
+  /** Real React tree. When set, preview uses this until the user edits `code`. */
+  Component?: ComponentType
 }
 
 export type Template = {

@@ -362,7 +362,10 @@ export function InlineBlock({block}: { block: Block }) {
     setFormatError(null);
   }, [block.id, block.code]);
 
-  const editableBlock = {...block, code: reactCode};
+  const codeWasEdited = reactCode !== block.code;
+  const previewBlock: Block = codeWasEdited
+    ? {...block, code: reactCode, Component: undefined}
+    : {...block, code: reactCode};
   const codeToDisplay = language === 'react' ? reactCode : htmlMarkup;
   const copyCode = async () => {
     await navigator.clipboard?.writeText(codeToDisplay || block.code);
@@ -413,7 +416,7 @@ export function InlineBlock({block}: { block: Block }) {
 
   return <article className="inline-block" data-testid={`inline-block-${block.id}`}>
     {language === 'html' && (
-      <RenderedMarkupCapture block={editableBlock} onMarkup={handleMarkup}/>
+      <RenderedMarkupCapture block={previewBlock} onMarkup={handleMarkup}/>
     )}
     <div className="inline-block-head">
       <div><span className="label">{block.category}</span>
@@ -446,7 +449,7 @@ export function InlineBlock({block}: { block: Block }) {
         {language === 'html' && htmlMarkup ? (
           <div className="html-live-preview" dangerouslySetInnerHTML={{__html: htmlMarkup}}/>
         ) : (
-          <RealBlockPreview block={editableBlock}/>
+          <RealBlockPreview block={previewBlock}/>
         )}
       </div> :
       <div className="inline-code">

@@ -326,12 +326,19 @@ function LivePreviewError({block, detail}: { block: Block; detail?: string }) {
     );
 }
 
+function NativeBlockPreview({block}: { block: Block }) {
+    const Preview = block.Component!;
+    return (
+        <PreviewErrorBoundary key={block.id} fallback={<LivePreviewError block={block}/>}>
+            <div className="real-ui live-preview">
+                <Preview/>
+            </div>
+        </PreviewErrorBoundary>
+    );
+}
+
 function LiveBlockPreview({block}: { block: Block }) {
     const compiled = useMemo(() => compileBlockComponent(block.code), [block.id, block.code]);
-
-    if (compiled.status === 'error') {
-        return <LivePreviewError block={block} detail={compiled.message}/>;
-    }
 
     const {GeneratedBlock} = compiled;
     return (
@@ -365,6 +372,7 @@ export function RealBlockPreview({block}: { block: Block }) {
     const [chosenPlan, setChosenPlan] = useState('Pro');
     const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly');
     const [joined, setJoined] = useState(false);
+    if (block.Component) return <NativeBlockPreview block={block}/>;
     if (block.id === 'pricing') return <div className="real-ui pricing-ui">
         <div className="pricing-heading">
             <div className="real-ui-intro"><span className="real-eyebrow">Simple pricing</span><h3>Pick the plan that
