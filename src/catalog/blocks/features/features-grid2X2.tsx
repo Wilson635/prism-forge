@@ -1,49 +1,71 @@
 import { Fingerprint, Lock, RefreshCw, Zap } from 'lucide-react'
 
-export default function FeaturesGrid2X2() {
-  const features = [
-    {
-      name: 'Push to deploy',
-      description: 'Automated pipelines ship your code the moment you merge, no manual steps required.',
-      icon: Zap
-    },
-    {
-      name: 'SSL certificates',
-      description: 'Every domain is encrypted automatically and renewed silently in the background.',
-      icon: Lock
-    },
-    {
-      name: 'Simple queues',
-      description: 'Background jobs run reliably with built-in retries and dead-letter handling.',
-      icon: RefreshCw
-    },
-    {
-      name: 'Advanced security',
-      description: 'Fingerprint-level auth and anomaly detection keep every session locked down.',
-      icon: Fingerprint
-    },
-  ];
+const features = [
+  {
+    name: 'Push to deploy',
+    description: 'Automated pipelines ship the moment you merge. No ceremony.',
+    icon: Zap,
+    meta: 'main → edge',
+  },
+  {
+    name: 'Managed TLS',
+    description: 'Every domain encrypted and renewed in the background.',
+    icon: Lock,
+    meta: 'auto-renew',
+  },
+  {
+    name: 'Simple queues',
+    description: 'Jobs with retries and a dead-letter you can actually open.',
+    icon: RefreshCw,
+    meta: 'at-least-once',
+  },
+  {
+    name: 'Session lock',
+    description: 'Fingerprint-level auth. Anomalies die in the first hop.',
+    icon: Fingerprint,
+    meta: 'device-bound',
+  },
+]
 
+export default function FeaturesGrid2X2() {
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-[color:var(--line)] bg-[color:var(--bg)] px-8 py-16 sm:px-12">
-      <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-[color:var(--green)] opacity-20 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-[color:var(--purple)] opacity-20 blur-3xl" />
-      <div className="relative mx-auto max-w-2xl text-center">
-        <p className="text-sm font-semibold tracking-wide text-[color:var(--green)]">Deploy faster</p>
-        <h2 className="mt-2 bg-gradient-to-r from-[color:var(--text)] to-[color:var(--muted)] bg-clip-text text-4xl font-semibold text-transparent sm:text-5xl">
-          Everything you need to ship
-        </h2>
-      </div>
-      <div className="relative mx-auto mt-14 grid max-w-4xl grid-cols-1 gap-5 sm:grid-cols-2">
-        {features.map((feature) => (
-          <div key={feature.name} className="group rounded-2xl border border-[color:var(--line)] bg-[color:var(--panel)]/60 p-6 backdrop-blur-xl transition hover:border-[color:var(--green-deep)]/50">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[color:var(--green)] to-[color:var(--green-deep)] shadow-lg shadow-[color:var(--green)]/20">
-              <feature.icon size={20} className="text-[color:var(--bg)]" />
-            </div>
-            <h3 className="mt-4 text-base font-semibold text-[color:var(--text)]">{feature.name}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-[color:var(--muted)]">{feature.description}</p>
-          </div>
-        ))}
+    <section className="relative overflow-hidden bg-[color:var(--bg)] px-6 py-20 font-['Manrope',sans-serif] sm:px-10 lg:py-24">
+      <div
+        className="pointer-events-none absolute -top-32 right-0 h-80 w-80 rounded-full opacity-50 blur-3xl"
+        style={{ background: 'radial-gradient(circle, var(--green), transparent 70%)' }}
+      />
+      <div
+        className="pointer-events-none absolute -bottom-32 left-0 h-80 w-80 rounded-full opacity-40 blur-3xl"
+        style={{ background: 'radial-gradient(circle, var(--purple), transparent 70%)' }}
+      />
+      <div className="relative mx-auto max-w-6xl">
+        <div className="max-w-xl">
+          <p className="font-['DM_Mono',monospace] text-[11px] tracking-[0.18em] text-[color:var(--green)] uppercase">
+            Deploy faster
+          </p>
+          <h2 className="mt-3 bg-gradient-to-r from-[color:var(--text)] via-[color:var(--text)] to-[color:var(--green)] bg-clip-text text-4xl font-semibold tracking-tight text-transparent sm:text-5xl">
+            Everything required to ship. Nothing to decorate.
+          </h2>
+        </div>
+        <div className="mt-14 grid gap-4 sm:grid-cols-2">
+          {features.map((feature) => (
+            <article
+              key={feature.name}
+              className="group rounded-2xl border border-[color:var(--line)] bg-[color:var(--panel)]/80 p-6 backdrop-blur-sm transition hover:border-[color:var(--green)]/35"
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-[color:var(--line)] bg-[color:var(--bg)] text-[color:var(--green)]">
+                  <feature.icon size={18} />
+                </div>
+                <span className="font-['DM_Mono',monospace] text-[10px] tracking-[0.14em] text-[color:var(--muted)] uppercase">
+                  {feature.meta}
+                </span>
+              </div>
+              <h3 className="mt-5 text-base font-semibold text-[color:var(--text)]">{feature.name}</h3>
+              <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">{feature.description}</p>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   )

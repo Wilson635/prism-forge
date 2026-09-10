@@ -5,7 +5,7 @@ import source from './features.tsx?raw'
 
 export const block = defineBlock({
   id: "features",
-  name: "Bento feature grid",
+  name: "Features — Split console",
   category: "Features",
   tone: "mint",
   icon: Grid2X2,

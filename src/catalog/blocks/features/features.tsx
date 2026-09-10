@@ -1,44 +1,53 @@
 import { Cloud, Lock, Server } from 'lucide-react'
 
-export default function Features() {
-  const features = [
-    {
-      name: "Instant deploys",
-      desc: "Ship straight from your branch with zero-downtime releases.",
-      icon: Cloud
-    },
-    {
-      name: "Managed TLS",
-      desc: "Certificates renew automatically across every environment.",
-      icon: Lock
-    },
-    {
-      name: "Automated backups",
-      desc: "Point-in-time snapshots run on a schedule you control.",
-      icon: Server
-    }
-  ];
+const features = [
+  {
+    name: 'Instant deploys',
+    desc: 'Ship from main with zero-downtime releases and one-click rollbacks.',
+    icon: Cloud,
+  },
+  {
+    name: 'Managed TLS',
+    desc: 'Certificates issue and renew quietly across every custom domain.',
+    icon: Lock,
+  },
+  {
+    name: 'Automated backups',
+    desc: 'Point-in-time snapshots on a schedule you actually control.',
+    icon: Server,
+  },
+]
 
+const log = [
+  { time: '09:41:02', label: 'build', status: 'ok' },
+  { time: '09:41:18', label: 'tls', status: 'ok' },
+  { time: '09:41:19', label: 'edge', status: 'ok' },
+  { time: '09:41:22', label: 'health', status: 'live' },
+]
+
+export default function Features() {
   return (
-    <section className="rounded-3xl bg-[#090b0a] px-6 py-20 sm:px-10">
-      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-16 lg:grid-cols-2 lg:items-center">
+    <section className="bg-[color:var(--bg)] px-6 py-20 font-['Manrope',sans-serif] sm:px-10 lg:py-24">
+      <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-2">
         <div>
-          <span className="text-sm font-semibold text-[#79f2b0]">Ship faster</span>
-          <h2 className="mt-3 text-4xl font-semibold tracking-tight text-[#f1f5f2] sm:text-5xl">
-            A calmer way to run infrastructure
-          </h2>
-          <p className="mt-5 text-base leading-relaxed text-[#8b958f]">
-            Every release, certificate and backup is handled for you, so the team can spend its time on the product instead of the plumbing underneath it.
+          <p className="font-['DM_Mono',monospace] text-[11px] tracking-[0.18em] text-[color:var(--green)] uppercase">
+            Ship faster
           </p>
-          <dl className="mt-10 space-y-6">
+          <h2 className="mt-3 text-4xl font-semibold tracking-tight text-[color:var(--text)] sm:text-5xl">
+            A calmer way to run infrastructure.
+          </h2>
+          <p className="mt-5 max-w-md text-sm leading-7 text-[color:var(--muted)]">
+            Releases, certificates and backups stay out of the way — so the team spends time on the product, not the plumbing.
+          </p>
+          <dl className="mt-10 space-y-5">
             {features.map((feature) => (
               <div key={feature.name} className="flex gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[#252c28] bg-gradient-to-br from-[#3ecf8e]/20 to-transparent">
-                  <feature.icon size={18} className="text-[#79f2b0]" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[color:var(--line)] bg-[color:var(--panel)]">
+                  <feature.icon size={16} className="text-[color:var(--green)]" />
                 </div>
                 <div>
-                  <dt className="text-sm font-semibold text-[#f1f5f2]">{feature.name}</dt>
-                  <dd className="mt-1 text-sm text-[#8b958f]">{feature.desc}</dd>
+                  <dt className="text-sm font-semibold text-[color:var(--text)]">{feature.name}</dt>
+                  <dd className="mt-1 text-sm leading-6 text-[color:var(--muted)]">{feature.desc}</dd>
                 </div>
               </div>
             ))}
@@ -46,21 +55,37 @@ export default function Features() {
         </div>
 
         <div className="relative">
-          <div className="pointer-events-none absolute -inset-6 rounded-[2rem] bg-gradient-to-br from-[#79f2b0]/20 via-[#7fc8ff]/10 to-transparent blur-2xl" />
-          <div className="relative rounded-2xl border border-[#252c28] bg-[#101311]/80 p-2 shadow-2xl backdrop-blur-xl">
-            <div className="flex items-center gap-1.5 border-b border-[#252c28] px-3 py-2.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#f7a77a]/60" />
-              <span className="h-2.5 w-2.5 rounded-full bg-[#79f2b0]/60" />
-              <span className="h-2.5 w-2.5 rounded-full bg-[#7fc8ff]/60" />
-            </div>
-            <div className="space-y-3 p-6">
-              <div className="h-3 w-2/3 rounded-full bg-gradient-to-r from-[#79f2b0]/40 to-transparent" />
-              <div className="h-3 w-1/2 rounded-full bg-[#151a17]" />
-              <div className="mt-5 grid grid-cols-3 gap-3">
-                <div className="aspect-square rounded-xl bg-gradient-to-br from-[#79f2b0]/20 to-transparent" />
-                <div className="aspect-square rounded-xl bg-gradient-to-br from-[#7fc8ff]/20 to-transparent" />
-                <div className="aspect-square rounded-xl bg-gradient-to-br from-[#b99cff]/20 to-transparent" />
+          <div className="pointer-events-none absolute -inset-8 rounded-[2rem] bg-[color:var(--green)]/10 blur-3xl" />
+          <div className="relative overflow-hidden rounded-2xl border border-[color:var(--line)] bg-[color:var(--panel)] shadow-[0_24px_80px_rgba(0,0,0,.35)]">
+            <div className="flex items-center justify-between border-b border-[color:var(--line)] px-4 py-3">
+              <div className="flex gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-[color:var(--orange)]/70" />
+                <span className="h-2.5 w-2.5 rounded-full bg-[color:var(--green)]/70" />
+                <span className="h-2.5 w-2.5 rounded-full bg-[color:var(--blue)]/70" />
               </div>
+              <span className="font-['DM_Mono',monospace] text-[10px] tracking-wide text-[color:var(--muted)]">
+                prod · orbit-web
+              </span>
+            </div>
+            <div className="space-y-2 p-4 font-['DM_Mono',monospace] text-[12px]">
+              {log.map((row) => (
+                <div
+                  key={row.time}
+                  className="flex items-center justify-between rounded-xl border border-[color:var(--line)] bg-[color:var(--bg)] px-3 py-2.5"
+                >
+                  <span className="text-[color:var(--muted)]">{row.time}</span>
+                  <span className="text-[color:var(--text)]">{row.label}</span>
+                  <span
+                    className={
+                      row.status === 'live'
+                        ? 'text-[color:var(--green)]'
+                        : 'text-[color:var(--blue)]'
+                    }
+                  >
+                    {row.status}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

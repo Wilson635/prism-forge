@@ -5,7 +5,7 @@ import source from './hero.tsx?raw'
 
 export const block = defineBlock({
   id: "hero",
-  name: "Product hero / Split",
+  name: "Hero — Product split",
   category: "Hero",
   tone: "violet",
   icon: Sparkles,

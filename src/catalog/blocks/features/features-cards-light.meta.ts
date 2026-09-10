@@ -5,7 +5,7 @@ import source from './features-cards-light.tsx?raw'
 
 export const block = defineBlock({
   id: "features-cards-light",
-  name: "Feature cards / Light",
+  name: "Features — Light triad",
   category: "Features",
   tone: "blue",
   icon: ShieldCheck,

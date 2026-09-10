@@ -5,7 +5,7 @@ import source from './bento.tsx?raw'
 
 export const block = defineBlock({
   id: "bento",
-  name: "Bento feature grid",
+  name: "Features — Focus pair",
   category: "Features",
   tone: "mint",
   icon: Grid2X2,
