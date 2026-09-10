@@ -1,6 +1,6 @@
   import {ArrowUpRight, Check, Code2, Copy, Grid2X2, Layers3, User, Zap} from 'lucide-react';
 import {Link} from 'wouter';
-import {blocks, kits, templates} from '@/data/data';
+import {blocks, kits, templates} from '@/catalog';
 import {Logo, Nav} from '@/components/Brand';
 import {MiniPreview} from '@/components/Previews';
 import {SectionIntro} from '@/components/SectionIntro';
