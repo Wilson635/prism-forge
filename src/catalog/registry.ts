@@ -3,17 +3,13 @@ import { parseCatalog } from './schema'
 import type { Block } from './types'
 
 /**
- * Add a legacy string block: `src/catalog/blocks/<category>/<id>.ts`
- * exporting `const block = { ... } satisfies Block`.
- *
- * Add a compiled block: `<id>.tsx` (the UI) + `<id>.meta.ts` that
- * `defineBlock`s metadata, `code` from `?raw`, and `Component`.
- *
- * New files are picked up automatically. Append the id to `blockOrder`
- * only if it must appear before the end of the list.
+ * Each block is `<id>.tsx` (the UI) + `<id>.meta.ts` (`defineBlock`,
+ * `code` from `?raw`, and `Component`). New `.meta.ts` files are picked
+ * up automatically. Append the id to `blockOrder` only if it must appear
+ * before the end of the list.
  */
 
-const modules = import.meta.glob<Block>('./blocks/**/*.ts', {
+const modules = import.meta.glob<Block>('./blocks/**/*.meta.ts', {
   eager: true,
   import: 'block',
 })

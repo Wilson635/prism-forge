@@ -188,8 +188,7 @@ export function BlocksPage() {
                             <span className="eyebrow">UI Blocks / {activeCategory} / Page sections</span>
                             <h1>{activeSection}</h1>
                             <p>
-                                Use these thoughtfully crafted examples to highlight the most important parts of
-                                your product. Built with real-world layouts and ready to make your own.
+                                Preview each block in a live, resizable canvas. Copy the source when it feels right.
                             </p>
                         </div>
 

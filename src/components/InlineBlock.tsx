@@ -1,308 +1,139 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
-import {Check, Code2, Copy, Loader2, Monitor, Sparkles, Smartphone} from 'lucide-react';
-import CodeMirror from '@uiw/react-codemirror';
-import {EditorView, keymap} from '@codemirror/view';
-import {indentWithTab} from '@codemirror/commands';
-import {javascript} from '@codemirror/lang-javascript';
-import {html} from '@codemirror/lang-html';
-import {createTheme} from '@uiw/codemirror-themes';
-import {tags as t} from '@lezer/highlight';
-import * as prettier from 'prettier/standalone';
-import * as prettierPluginBabel from 'prettier/plugins/babel';
-import * as prettierPluginEstree from 'prettier/plugins/estree';
-import * as prettierPluginHtml from 'prettier/plugins/html';
+import type {PointerEvent as ReactPointerEvent, ReactNode} from 'react';
+import {Check, Code2, Columns2, Copy, Eye, Laptop, Monitor, Smartphone, Tablet} from 'lucide-react';
+import {createHighlighter} from 'shiki/bundle/web';
+import type {Highlighter} from 'shiki/bundle/web';
 import type {Block} from '@/catalog';
 import {RealBlockPreview} from './Previews';
 
 type CodeLanguage = 'react' | 'html';
+type WorkspaceTab = 'preview' | 'code' | 'split';
 
-/**
- * Real Prettier formatting, running in the browser via the standalone
- * build — no Node.js dependency, so this works fine in a Vite bundle.
- * `babel-ts` handles both plain JSX and TSX (typed) source in one parser,
- * so we don't need a separate typescript/estree-only plugin for that case.
- */
-async function formatSourceCode(source: string, language: CodeLanguage) {
-  const normalized = source.replace(/\r\n/g, '\n').trim();
-  if (!normalized) return '';
+const VIEWPORTS = [
+  {id: 'phone', label: '390', width: 390, icon: Smartphone},
+  {id: 'tablet', label: '768', width: 768, icon: Tablet},
+  {id: 'laptop', label: '1024', width: 1024, icon: Laptop},
+  {id: 'desktop', label: '1280', width: 1280, icon: Monitor},
+  {id: 'fluid', label: 'Fluid', width: null as number | null, icon: Columns2},
+] as const;
 
-  if (language === 'html') {
-    return prettier.format(normalized, {
-      parser: 'html',
-      plugins: [prettierPluginHtml],
-      tabWidth: 2,
-      htmlWhitespaceSensitivity: 'ignore',
-    });
-  }
+const MIN_PREVIEW_WIDTH = 320;
 
-  return prettier.format(normalized, {
-    parser: 'babel-ts',
-    plugins: [prettierPluginBabel, prettierPluginEstree],
-    tabWidth: 2,
-    printWidth: 80,
-    singleQuote: true,
-    semi: true,
-    trailingComma: 'es5',
-  });
+function escapeHtml(value: string) {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
 }
 
-/**
- * Custom CodeMirror 6 theme matching the editor's existing dark chrome
- * (transparent background so the gradient behind it stays visible, mint
- * accent for keywords/tags to echo the React tab dot color).
- */
-const editorTheme = createTheme({
-  theme: 'dark',
-  settings: {
-    background: 'transparent',
-    backgroundImage: '',
-    foreground: '#bdbdbd',
-    caret: '#f4f4f5',
-    selection: 'rgba(97, 218, 251, 0.18)',
-    selectionMatch: 'rgba(97, 218, 251, 0.12)',
-    lineHighlight: 'rgba(255,255,255,0.03)',
-    gutterBackground: 'transparent',
-    gutterForeground: '#454545',
-    gutterActiveForeground: '#a1a1aa',
-    gutterBorder: 'transparent',
-    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-  },
-  styles: [
-    {tag: t.comment, color: '#5c6370', fontStyle: 'italic'},
-    {tag: [t.keyword, t.operatorKeyword, t.controlKeyword, t.moduleKeyword], color: '#61dafb'},
-    {tag: [t.string, t.special(t.string)], color: '#e6c07b'},
-    {tag: [t.number, t.bool, t.null, t.atom], color: '#d19a66'},
-    {tag: [t.function(t.variableName), t.definition(t.function(t.variableName))], color: '#a7f3d0'},
-    {tag: t.variableName, color: '#bdbdbd'},
-    {tag: t.definition(t.variableName), color: '#f4f4f5'},
-    {tag: [t.tagName], color: '#f59e0b'},
-    {tag: [t.attributeName], color: '#61dafb'},
-    {tag: [t.propertyName], color: '#c084fc'},
-    {tag: [t.punctuation, t.bracket, t.separator], color: '#71717a'},
-    {tag: t.className, color: '#4ade80'},
-    {tag: t.typeName, color: '#4ade80'},
-    {tag: t.operator, color: '#71717a'},
-    {tag: t.invalid, color: '#f87171'},
-  ],
-});
+const highlightCache = new Map<string, string>();
+let highlighterPromise: Promise<Highlighter> | null = null;
 
-function CodeEditor({
-                      blockId,
-                      language,
-                      value,
-                      onChange,
-                      onFormat,
-                      isFormatting,
-                      formatError,
-                      onCopy,
-                      copied,
-                      onLanguageChange,
-                    }: {
+function getHighlighter() {
+  highlighterPromise ??= createHighlighter({
+    langs: ['tsx', 'html'],
+    themes: ['github-dark'],
+  });
+  return highlighterPromise;
+}
+
+async function highlightSource(source: string, language: CodeLanguage) {
+  const key = `${language}:${source}`;
+  const cached = highlightCache.get(key);
+  if (cached) return cached;
+
+  const highlighter = await getHighlighter();
+  const html = highlighter.codeToHtml(source, {
+    lang: language === 'react' ? 'tsx' : 'html',
+    theme: 'github-dark',
+  });
+  highlightCache.set(key, html);
+  return html;
+}
+
+function CodeViewer({
+  blockId,
+  language,
+  value,
+  onCopy,
+  copied,
+  onLanguageChange,
+}: {
   blockId: string;
   language: CodeLanguage;
   value: string;
-  onChange: (value: string) => void;
-  onFormat: () => void;
-  isFormatting: boolean;
-  formatError: string | null;
   onCopy: () => void;
   copied: boolean;
   onLanguageChange: (language: CodeLanguage) => void;
 }) {
+  const [highlighted, setHighlighted] = useState('');
   const lineCount = Math.max(1, value.split('\n').length);
 
-  const editorExtensions = [
-    language === 'react' ? javascript({jsx: true, typescript: true}) : html(),
-    keymap.of([indentWithTab]),
-    EditorView.lineWrapping,
-  ];
+  useEffect(() => {
+    if (!value) {
+      setHighlighted('');
+      return;
+    }
+    let cancelled = false;
+    highlightSource(value, language).then((html) => {
+      if (!cancelled) setHighlighted(html);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [language, value]);
 
   return (
-    <div
-      className="code-editor"
-      data-testid={`code-editor-${blockId}`}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        border: 'none',
-        background:
-          'linear-gradient(180deg, rgba(21,26,23,0.65) 0%, rgba(9,11,10,0.92) 100%), linear-gradient(180deg, #151a17 0%, #090b0a 100%)',
-        backgroundBlendMode: 'overlay, normal',
-        color: '#f1f5f2',
-        backdropFilter: 'blur(30px) saturate(140%)',
-        WebkitBackdropFilter: 'blur(30px) saturate(140%)',
-        scrollbarWidth: 'none',
-        boxShadow:
-          'inset 0 1px 0 rgba(241,245,242,.08), inset 0 0 40px rgba(62,207,142,.03), 0 40px 90px -30px rgba(0,0,0,.75), 0 12px 30px -10px rgba(0,0,0,.6)',
-      }}
-    >
-      <div
-        className="code-editor-tabs"
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          minHeight: 56,
-          padding: '0 12px 0 14px',
-          borderBottom: '1px solid rgba(37,44,40,0.7)',
-          background: 'transparent',
-        }}
-      >
-        <div style={{display: 'flex', alignItems: 'center', gap: 4, overflowX: 'auto'}}>
+    <div className="playground-editor" data-testid={`code-editor-${blockId}`}>
+      <div className="playground-editor-bar">
+        <div className="playground-lang" role="tablist">
           <button
-            className={language === 'react' ? 'active' : ''}
-            onClick={() => onLanguageChange('react')}
             role="tab"
             aria-selected={language === 'react'}
+            className={language === 'react' ? 'is-active' : ''}
+            onClick={() => onLanguageChange('react')}
             data-testid={`button-editor-react-${blockId}`}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              border: language === 'react' ? '1px solid rgba(255,255,255,0.09)' : '1px solid transparent',
-              borderRadius: 9,
-              padding: '8px 10px',
-              background: language === 'react' ? 'rgba(255,255,255,0.07)' : 'transparent',
-              boxShadow: language === 'react' ? 'inset 0 1px 0 rgba(255,255,255,.06)' : 'none',
-              color: language === 'react' ? '#f4f4f5' : '#71717a',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              font: '500 11px ui-monospace, SFMono-Regular, Menlo, monospace',
-            }}
           >
-            <span style={{width: 8, height: 8, borderRadius: 3, background: '#61dafb'}}/>
-            React / TSX
+            TSX
           </button>
           <button
-            className={language === 'html' ? 'active' : ''}
-            onClick={() => onLanguageChange('html')}
             role="tab"
             aria-selected={language === 'html'}
+            className={language === 'html' ? 'is-active' : ''}
+            onClick={() => onLanguageChange('html')}
             data-testid={`button-editor-html-${blockId}`}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              border: language === 'html' ? '1px solid rgba(255,255,255,0.09)' : '1px solid transparent',
-              borderRadius: 9,
-              padding: '8px 10px',
-              background: language === 'html' ? 'rgba(255,255,255,0.07)' : 'transparent',
-              boxShadow: language === 'html' ? 'inset 0 1px 0 rgba(255,255,255,.06)' : 'none',
-              color: language === 'html' ? '#f4f4f5' : '#71717a',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              font: '500 11px ui-monospace, SFMono-Regular, Menlo, monospace',
-            }}
           >
-            <span style={{width: 8, height: 8, borderRadius: 3, background: '#f59e0b'}}/>
             HTML
           </button>
         </div>
-        <button
-          onClick={onCopy}
-          title={copied ? 'Code copié !' : 'Copier le code'}
-          aria-label={copied ? 'Code copié' : 'Copier le code'}
-          data-testid={`button-editor-copy-${blockId}`}
-          style={{
-            display: 'grid',
-            flex: '0 0 auto',
-            placeItems: 'center',
-            width: 32,
-            height: 32,
-            border: '1px solid rgba(255,255,255,0.09)',
-            borderRadius: 9,
-            background: 'rgba(255,255,255,0.04)',
-            color: copied ? '#a7f3d0' : '#a1a1aa',
-            cursor: 'pointer',
-          }}
-        >
-          {copied ? <Check size={14}/> : <Copy size={14}/>}
-        </button>
-      </div>
-      <div style={{minHeight: 360, maxHeight: 520, overflow: 'auto'}}>
-        <CodeMirror
-          value={value}
-          onChange={onChange}
-          theme={editorTheme}
-          extensions={editorExtensions}
-          basicSetup={{
-            lineNumbers: true,
-            foldGutter: true,
-            highlightActiveLine: true,
-            highlightActiveLineGutter: true,
-            bracketMatching: true,
-            closeBrackets: true,
-            indentOnInput: true,
-            autocompletion: true,
-            tabSize: 2,
-          }}
-          style={{fontSize: 13}}
-          aria-label={`${language === 'react' ? 'React TSX' : 'HTML'} code editor`}
-        />
+        <span className="playground-readonly">Read only</span>
+        <div className="playground-editor-actions">
+          <button onClick={onCopy} data-testid={`button-editor-copy-${blockId}`}>
+            {copied ? <Check size={13} /> : <Copy size={13} />}
+            {copied ? 'Copied' : 'Copy'}
+          </button>
+        </div>
       </div>
       <div
-        className="code-editor-foot"
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          gap: 12,
-          alignItems: 'center',
-          minHeight: 42,
-          padding: '0 14px',
-          borderTop: '1px solid rgba(255,255,255,0.06)',
-          background: 'transparent',
-          color: '#626262',
-          font: '10px ui-monospace, SFMono-Regular, Menlo, monospace',
+        className="playground-code"
+        tabIndex={0}
+        aria-label={`${language === 'react' ? 'React TSX' : 'HTML'} source`}
+        dangerouslySetInnerHTML={{
+          __html: highlighted || `<pre><code>${escapeHtml(value || 'Generating HTML…')}</code></pre>`,
         }}
-      >
-        <div style={{display: 'flex', alignItems: 'center', gap: 12}}>
-                    <span style={{display: 'inline-flex', alignItems: 'center', gap: 5}}>
-                        <span style={{width: 5, height: 5, borderRadius: '50%', background: '#4ade80'}}/>
-                        Live preview
-                    </span>
-          <span>{lineCount} lignes</span>
-          {formatError && (
-            <span title={formatError} style={{color: '#f87171', cursor: 'help'}}>
-                            Erreur de syntaxe
-                        </span>
-          )}
-        </div>
-        <button
-          onClick={onFormat}
-          disabled={isFormatting}
-          title="Formater le code avec Prettier"
-          data-testid={`button-format-${blockId}`}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 5,
-            border: 0,
-            padding: '5px 0',
-            background: 'transparent',
-            color: '#a1a1aa',
-            cursor: isFormatting ? 'wait' : 'pointer',
-            opacity: isFormatting ? 0.6 : 1,
-            font: 'inherit',
-          }}
-        >
-          {isFormatting ? <Loader2 size={12} className="spin"/> : <Sparkles size={12}/>}
-          {isFormatting ? 'Formatage…' : 'Formater'}
-        </button>
+      />
+      <div className="playground-editor-foot">
+        <span>{language === 'react' ? 'React + Tailwind' : 'Rendered markup'}</span>
+        <span>{lineCount} lines</span>
       </div>
     </div>
   );
 }
 
-/**
- * Captures the actual DOM produced by the React preview. This gives the HTML
- * mode a faithful source instead of trying to convert JSX with regular
- * expressions (which breaks on maps, expressions, components and hooks).
- */
 function RenderedMarkupCapture({
-                                 block,
-                                 onMarkup,
-                               }: {
+  block,
+  onMarkup,
+}: {
   block: Block;
   onMarkup: (markup: string) => void;
 }) {
@@ -311,10 +142,8 @@ function RenderedMarkupCapture({
   useEffect(() => {
     const element = captureRef.current;
     if (!element) return;
-
     const updateMarkup = () => onMarkup(element.innerHTML);
     updateMarkup();
-
     const observer = new MutationObserver(updateMarkup);
     observer.observe(element, {
       subtree: true,
@@ -323,150 +152,189 @@ function RenderedMarkupCapture({
       characterData: true,
     });
     return () => observer.disconnect();
-  }, [block.id, block.code, onMarkup]);
+  }, [block.id, onMarkup]);
 
   return (
-    <div
-      ref={captureRef}
-      aria-hidden="true"
-      style={{
-        position: 'absolute',
-        width: 1,
-        height: 1,
-        overflow: 'hidden',
-        opacity: 0,
-        pointerEvents: 'none',
-      }}
-    >
-      <RealBlockPreview block={block}/>
+    <div ref={captureRef} className="playground-html-capture" aria-hidden="true">
+      <RealBlockPreview block={block} />
     </div>
   );
 }
 
-export function InlineBlock({block}: { block: Block }) {
-  const [tab, setTab] = useState<'preview' | 'code'>('preview');
-  const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop');
-  const [language, setLanguage] = useState<CodeLanguage>('react');
-  const [reactCode, setReactCode] = useState(block.code);
-  const [htmlMarkup, setHtmlMarkup] = useState('');
-  const [htmlWasEdited, setHtmlWasEdited] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [isFormatting, setIsFormatting] = useState(false);
-  const [formatError, setFormatError] = useState<string | null>(null);
+function ResizablePreview({
+  blockId,
+  children,
+}: {
+  blockId: string;
+  children: ReactNode;
+}) {
+  const viewerRef = useRef<HTMLDivElement>(null);
+  const [viewerWidth, setViewerWidth] = useState(0);
+  const [width, setWidth] = useState<number | null>(null);
+  const [dragging, setDragging] = useState(false);
 
   useEffect(() => {
-    setReactCode(block.code);
-    setHtmlMarkup('');
-    setHtmlWasEdited(false);
-    setCopied(false);
-    setFormatError(null);
-  }, [block.id, block.code]);
+    const viewer = viewerRef.current;
+    if (!viewer) return;
+    const update = () => setViewerWidth(Math.max(MIN_PREVIEW_WIDTH, Math.floor(viewer.clientWidth)));
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(viewer);
+    return () => observer.disconnect();
+  }, []);
 
-  const codeWasEdited = reactCode !== block.code;
-  const previewBlock: Block = codeWasEdited
-    ? {...block, code: reactCode, Component: undefined}
-    : {...block, code: reactCode};
-  const codeToDisplay = language === 'react' ? reactCode : htmlMarkup;
+  const appliedWidth =
+    width === null || viewerWidth === 0
+      ? viewerWidth
+      : Math.min(Math.max(width, MIN_PREVIEW_WIDTH), viewerWidth);
+
+  const startDrag = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    const frame = event.currentTarget.parentElement;
+    if (!frame) return;
+    setDragging(true);
+    event.currentTarget.setPointerCapture(event.pointerId);
+    const left = frame.getBoundingClientRect().left;
+
+    const onMove = (ev: PointerEvent) => {
+      const next = Math.round(ev.clientX - left);
+      setWidth(Math.min(Math.max(next, MIN_PREVIEW_WIDTH), viewerRef.current?.clientWidth ?? next));
+    };
+    const onUp = () => {
+      setDragging(false);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+  };
+
+  return (
+    <div className="playground-stage-wrap">
+      <div className="playground-ruler">
+        <div className="playground-presets">
+          {VIEWPORTS.map((preset) => {
+            const Icon = preset.icon;
+            const active = preset.width === null ? width === null : width === preset.width;
+            return (
+              <button
+                key={preset.id}
+                className={active ? 'is-active' : ''}
+                onClick={() => setWidth(preset.width)}
+                title={preset.width ? `${preset.label}px` : 'Full width'}
+                data-testid={`button-viewport-${preset.id}-${blockId}`}
+              >
+                <Icon size={13} />
+                {preset.label}
+              </button>
+            );
+          })}
+        </div>
+        <span className="playground-width">{appliedWidth || viewerWidth}px</span>
+      </div>
+
+      <div ref={viewerRef} className={`playground-viewer${dragging ? ' is-dragging' : ''}`}>
+        <div className="playground-viewport" style={{width: appliedWidth || '100%'}}>
+          {children}
+          <button
+            type="button"
+            className="playground-resize"
+            aria-label="Resize preview"
+            onPointerDown={startDrag}
+          >
+            <span />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function InlineBlock({block}: {block: Block}) {
+  const [tab, setTab] = useState<WorkspaceTab>('preview');
+  const [language, setLanguage] = useState<CodeLanguage>('react');
+  const [htmlMarkup, setHtmlMarkup] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    setHtmlMarkup('');
+    setCopied(false);
+    setLanguage('react');
+  }, [block.id]);
+
+  const showPreview = tab === 'preview' || tab === 'split';
+  const showCode = tab === 'code' || tab === 'split';
+  const source = language === 'react' ? block.code : htmlMarkup;
+
   const copyCode = async () => {
-    await navigator.clipboard?.writeText(codeToDisplay || block.code);
+    await navigator.clipboard?.writeText(source || block.code);
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1500);
   };
 
   const handleMarkup = useCallback((markup: string) => {
-    setHtmlMarkup(current => htmlWasEdited ? current : markup);
-  }, [htmlWasEdited]);
+    setHtmlMarkup(markup);
+  }, []);
 
-  const handleLanguageChange = (nextLanguage: CodeLanguage) => {
-    setLanguage(nextLanguage);
-    setCopied(false);
-  };
+  return (
+    <article className="playground" data-testid={`inline-block-${block.id}`}>
+      {language === 'html' && <RenderedMarkupCapture block={block} onMarkup={handleMarkup} />}
 
-  const handleCodeChange = (value: string) => {
-    if (language === 'react') {
-      setReactCode(value);
-    } else {
-      setHtmlMarkup(value);
-      setHtmlWasEdited(true);
-    }
-    setCopied(false);
-    setFormatError(null);
-  };
-
-  const formatCurrentCode = async () => {
-    const source = codeToDisplay || (language === 'react' ? block.code : '');
-    if (!source || isFormatting) return;
-
-    setIsFormatting(true);
-    setFormatError(null);
-    try {
-      const formatted = await formatSourceCode(source, language);
-      handleCodeChange(formatted.trimEnd());
-    } catch (error) {
-      // Code invalide (parenthèse manquante, JSX non fermé pendant la
-      // frappe, etc.) — Prettier refuse de formater, on laisse le code
-      // tel quel et on signale l'erreur au lieu de planter l'éditeur.
-      const message = error instanceof Error ? error.message : String(error);
-      setFormatError(message);
-      console.error('Prettier formatting failed:', error);
-    } finally {
-      setIsFormatting(false);
-    }
-  };
-
-  return <article className="inline-block" data-testid={`inline-block-${block.id}`}>
-    {language === 'html' && (
-      <RenderedMarkupCapture block={previewBlock} onMarkup={handleMarkup}/>
-    )}
-    <div className="inline-block-head">
-      <div><span className="label">{block.category}</span>
-        <h2>{block.name === 'Bento feature grid' ? 'With product screenshot' : block.name}</h2></div>
-      <div className="inline-tools">
-        <div className="tool-tabs">
-          <button className={tab === 'preview' ? 'active' : ''} onClick={() => setTab('preview')}
-                  data-testid={`button-preview-${block.id}`}> Aperçu
-          </button>
-          <button className={tab === 'code' ? 'active' : ''} onClick={() => setTab('code')}
-                  data-testid={`button-code-${block.id}`}><Code2 size={13}/> Code source
+      <header className="playground-head">
+        <div>
+          <span className="playground-kicker">{block.category}</span>
+          <h2>{block.name === 'Bento feature grid' ? 'With product screenshot' : block.name}</h2>
+        </div>
+        <div className="playground-tools">
+          <div className="playground-tabs" role="tablist">
+            <button
+              className={tab === 'preview' ? 'is-active' : ''}
+              onClick={() => setTab('preview')}
+              data-testid={`button-preview-${block.id}`}
+            >
+              <Eye size={13} /> Preview
+            </button>
+            <button
+              className={tab === 'code' ? 'is-active' : ''}
+              onClick={() => setTab('code')}
+              data-testid={`button-code-${block.id}`}
+            >
+              <Code2 size={13} /> Code
+            </button>
+            <button
+              className={tab === 'split' ? 'is-active' : ''}
+              onClick={() => setTab('split')}
+              data-testid={`button-split-${block.id}`}
+            >
+              <Columns2 size={13} /> Split
+            </button>
+          </div>
+          <button className="playground-copy" onClick={copyCode} data-testid={`button-copy-${block.id}`}>
+            {copied ? <Check size={14} /> : <Copy size={14} />}
+            {copied ? 'Copied' : 'Copy'}
           </button>
         </div>
-        <div className="device-tabs">
-          <button className={device === 'desktop' ? 'active' : ''} onClick={() => setDevice('desktop')}
-                  title="Aperçu Desktop — 100%"
-                  data-testid={`button-desktop-${block.id}`}><Monitor size={13}/></button>
-          <button className={device === 'mobile' ? 'active' : ''} onClick={() => setDevice('mobile')}
-                  title="Aperçu Mobile — 375px"
-                  data-testid={`button-mobile-${block.id}`}> <Smartphone size={13}/> </button>
-        </div>
-        {tab === 'preview' && (
-          <button className="quick-copy" onClick={copyCode} title={copied ? 'Code copié !' : 'Copier le code'}
-                  data-testid={`button-copy-${block.id}`}>{copied ? <Check size={13}/> : <Copy
-            size={13}/>}</button>
-        )}
-      </div>
-    </div>
-    {tab === 'preview' ? <div className={`inline-preview ${device}`}>
-        {language === 'html' && htmlMarkup ? (
-          <div className="html-live-preview" dangerouslySetInnerHTML={{__html: htmlMarkup}}/>
-        ) : (
-          <RealBlockPreview block={previewBlock}/>
-        )}
-      </div> :
-      <div className="inline-code">
-        <CodeEditor
+      </header>
+
+      {showPreview && (
+        <ResizablePreview blockId={block.id}>
+          <RealBlockPreview block={block} />
+        </ResizablePreview>
+      )}
+
+      {showCode && (
+        <CodeViewer
           blockId={block.id}
           language={language}
-          value={codeToDisplay || 'Génération du HTML…'}
-          onChange={handleCodeChange}
-          onFormat={formatCurrentCode}
-          isFormatting={isFormatting}
-          formatError={formatError}
+          value={source || (language === 'html' ? 'Generating HTML…' : block.code)}
           onCopy={copyCode}
           copied={copied}
-          onLanguageChange={handleLanguageChange}
+          onLanguageChange={(next) => {
+            setLanguage(next);
+            setCopied(false);
+          }}
         />
-      </div>}
-    <div className="inline-block-foot"><span><Check size={13}/> Responsive component</span><span>Tailwind CSS · React · Accessible HTML</span>
-    </div>
-  </article>;
+      )}
+    </article>
+  );
 }

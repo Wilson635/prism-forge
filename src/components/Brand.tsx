@@ -97,9 +97,8 @@ export function NavBlock() {
     const [location] = useLocation();
 
     return (
-        <header className="nav-wrap">
+        <header className="nav-wrap nav-wrap--app">
             <nav className="nav">
-                <p></p>
                 <div className={`nav-links ${open ? 'open' : ''}`}>
                     <Link
                         href="/"

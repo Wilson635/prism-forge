@@ -33,7 +33,7 @@ export default function AnimatedBentoGrid() {
             </div>
 
             <div className="flex gap-6 border-b border-slate-100 py-3 text-xs font-semibold">
-              <span className="-mb-3 border-b-2 border-indigo-600 pb-3 text-indigo-600">Overview</span>
+              <span className="border-b-2 border-indigo-600 pb-3 -mb-3 text-indigo-600">Overview</span>
               <span className="cursor-pointer text-slate-400 transition hover:text-slate-600">Activity</span>
               <span className="cursor-pointer text-slate-400 transition hover:text-slate-600">Settings</span>
               <span className="cursor-pointer text-slate-400 transition hover:text-slate-600">Collaborators</span>
@@ -123,7 +123,9 @@ export default function AnimatedBentoGrid() {
                   </div>
                   <p className="mt-0.5 text-slate-500">
                     Pushed to{' '}
-                    <span className="rounded bg-slate-100 px-1 py-0.5 font-mono text-xs text-indigo-600">mobile-api</span>
+                    <span className="rounded bg-slate-100 px-1 py-0.5 font-mono text-xs text-indigo-600">
+                      mobile-api
+                    </span>
                   </p>
                 </div>
               </div>
