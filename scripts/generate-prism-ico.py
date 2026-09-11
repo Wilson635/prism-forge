@@ -1,16 +1,15 @@
-"""Rasterize the PRISM mark (same geometry as .logo-mark) into favicon.ico."""
+"""Rasterize the PRISM mark (same geometry as .logo-mark) into .ico files."""
 
 from __future__ import annotations
 
+import io
 import math
+import struct
 from pathlib import Path
 
 from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "public" / "favicon.ico"
-ALSO = ROOT / "public" / "prism-logo.ico"
-
 GREEN = (121, 242, 176)
 BG = (9, 11, 10)
 
@@ -31,7 +30,6 @@ def skew_y(deg):
 
 
 def compose(a, b):
-    """a after b: a * b."""
     return (
         a[0] * b[0] + a[1] * b[2],
         a[0] * b[1] + a[1] * b[3],
@@ -40,7 +38,6 @@ def compose(a, b):
     )
 
 
-# CSS/SVG: transform="skewY(30) rotate(30)" → rotate first, then skewY
 LAYERS = [
     (compose(skew_y(30), rotate(30)), 255),
     (compose(skew_y(-30), rotate(-30)), round(255 * 0.65)),
@@ -70,12 +67,33 @@ def render(size: int) -> Image.Image:
     return img
 
 
+def png_bytes(img: Image.Image) -> bytes:
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return buf.getvalue()
+
+
+def write_ico(path: Path, images: list[Image.Image]) -> None:
+    pngs = [png_bytes(im) for im in images]
+    count = len(images)
+    offset = 6 + 16 * count
+    directory = struct.pack("<HHH", 0, 1, count)
+    entries = b""
+    for im, data in zip(images, pngs):
+        w = 0 if im.width >= 256 else im.width
+        h = 0 if im.height >= 256 else im.height
+        entries += struct.pack("<BBBBHHII", w, h, 0, 0, 1, 32, len(data), offset)
+        offset += len(data)
+    path.write_bytes(directory + entries + b"".join(pngs))
+
+
 def main() -> None:
     sizes = (16, 32, 48, 64, 256)
     images = [render(s) for s in sizes]
-    images[0].save(OUT, format="ICO", sizes=[(s, s) for s in sizes], append_images=images[1:])
-    images[0].save(ALSO, format="ICO", sizes=[(s, s) for s in sizes], append_images=images[1:])
-    print(f"wrote {OUT} and {ALSO}")
+    for name in ("favicon.ico", "prism-logo.ico"):
+        dest = ROOT / "public" / name
+        write_ico(dest, images)
+        print(f"wrote {dest} ({dest.stat().st_size} bytes)")
 
 
 if __name__ == "__main__":
