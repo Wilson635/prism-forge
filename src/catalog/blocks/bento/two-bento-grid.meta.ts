@@ -5,7 +5,7 @@ import source from './two-bento-grid.tsx?raw'
 
 export const block = defineBlock({
   id: 'two-bento-grid',
-  name: 'Two row bento grid with three column second row',
+  name: 'Bento — Two by three -1',
   category: 'Bento',
   tone: 'blue',
   icon: Command,

@@ -1,100 +1,108 @@
-import { Lock } from 'lucide-react'
-
 export default function BentoFeatureShowcase() {
   return (
-    <section className="bg-[color:var(--bg)] px-6 py-20 sm:px-10">
+    <section className="bg-[color:var(--bg)] px-6 py-20 font-['Manrope',sans-serif] sm:px-10 lg:py-24">
       <div className="mx-auto max-w-6xl">
-        <div className="text-center">
-          <span className="text-xs font-semibold uppercase tracking-wide text-[color:var(--blue)]">Built for builders</span>
-          <p className="mx-auto mt-3 max-w-lg text-4xl font-semibold tracking-tight text-[color:var(--text)] sm:text-5xl">
-            Everything you need to ship your app
-          </p>
-        </div>
+        <p className="font-['DM_Mono',monospace] text-[11px] tracking-[0.18em] text-[color:var(--green)] uppercase">
+          Mosaic
+        </p>
+        <h2 className="mt-3 max-w-lg text-4xl font-semibold tracking-tight text-[color:var(--text)] sm:text-5xl">
+          Four rooms. One surface.
+        </h2>
 
-        <div className="mt-14 grid gap-4 lg:grid-cols-3 lg:grid-rows-2">
-          <div className="flex flex-col overflow-hidden rounded-3xl border border-[color:var(--line)] bg-[color:var(--panel)] lg:row-span-2">
-            <div className="p-7 pb-0">
-              <p className="text-sm font-semibold text-[color:var(--text)]">Mobile ready</p>
-              <p className="mt-1.5 text-sm text-[color:var(--muted)]">
-                Every block adapts down to a phone without any extra work on your end.
+        <div className="mt-12 grid gap-4 lg:grid-cols-12 lg:grid-rows-[auto_auto]">
+          <article className="relative overflow-hidden rounded-2xl border border-[color:var(--line)] bg-[color:var(--panel)] p-6 lg:col-span-5 lg:row-span-2">
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  'radial-gradient(ellipse at 50% 100%, color-mix(in oklab, var(--green) 14%, transparent), transparent 55%)',
+              }}
+            />
+            <p className="relative font-['DM_Mono',monospace] text-[10px] tracking-[0.16em] text-[color:var(--green)] uppercase">
+              Device
+            </p>
+            <h3 className="relative mt-2 text-lg font-semibold text-[color:var(--text)]">The page, in a hand.</h3>
+            <p className="relative mt-2 text-sm leading-6 text-[color:var(--muted)]">
+              Every block already collapses. No second layout to maintain.
+            </p>
+            <div className="relative mx-auto mt-8 w-[180px] rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--bg)] p-3 shadow-[0_24px_60px_rgba(0,0,0,.45)]">
+              <div className="mx-auto h-1 w-10 rounded-full bg-[color:var(--line)]" />
+              <p className="mt-4 font-['DM_Mono',monospace] text-[9px] tracking-[0.14em] text-[color:var(--green)] uppercase">
+                Orbit
               </p>
-            </div>
-            <div className="relative mt-6 flex flex-1 items-end justify-center px-8 pb-8">
-              <div className="w-40 rounded-t-[2rem] border-x-[10px] border-t-[10px] border-[color:var(--panel-2)] bg-[color:var(--bg)] pt-4 shadow-2xl">
-                <div className="mx-auto h-1 w-10 rounded-full bg-[color:var(--line)]" />
-                <div className="mt-5 space-y-2 px-4 pb-6">
-                  <div className="h-2 w-2/3 rounded-full bg-[color:var(--green)]/40" />
-                  <div className="h-2 w-1/2 rounded-full bg-[color:var(--panel-2)]" />
-                  <div className="mt-3 h-16 rounded-xl bg-gradient-to-br from-[color:var(--green)]/20 to-transparent" />
-                </div>
+              <p className="mt-1 text-[13px] font-semibold text-[color:var(--text)]">Ship quieter.</p>
+              <div className="mt-4 space-y-2">
+                {['Hero split', 'Features rail', 'CTA invite'].map((row, i) => (
+                  <div
+                    key={row}
+                    className={`rounded-lg border border-[color:var(--line)] px-2.5 py-2 text-[11px] ${i === 0 ? 'bg-[color:var(--panel-2)] text-[color:var(--text)]' : 'text-[color:var(--muted)]'}`}
+                  >
+                    {row}
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
+          </article>
 
-          <div className="rounded-3xl border border-[color:var(--line)] bg-[color:var(--panel)] p-7">
-            <p className="text-sm font-semibold text-[color:var(--text)]">Performance</p>
-            <p className="mt-1.5 text-sm text-[color:var(--muted)]">
-              Optimized rendering keeps every page fast, even on slow connections.
+          <article className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--panel)] p-6 lg:col-span-7">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="font-['DM_Mono',monospace] text-[10px] tracking-[0.16em] text-[color:var(--blue)] uppercase">
+                  Edge
+                </p>
+                <h3 className="mt-2 text-lg font-semibold text-[color:var(--text)]">12ms, not “fast”.</h3>
+              </div>
+              <p className="font-['DM_Mono',monospace] text-2xl text-[color:var(--green)]">p50</p>
+            </div>
+            <svg className="mt-6 w-full text-[color:var(--green)]" viewBox="0 0 360 72" fill="none" aria-hidden>
+              <path
+                d="M0 52 C40 52 50 28 90 30 C130 32 140 12 180 16 C220 20 230 44 270 36 C310 28 320 10 360 14"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              />
+              <path
+                d="M0 52 C40 52 50 28 90 30 C130 32 140 12 180 16 C220 20 230 44 270 36 C310 28 320 10 360 14 L360 72 L0 72 Z"
+                fill="url(#bentoSpark)"
+                opacity="0.28"
+              />
+              <defs>
+                <linearGradient id="bentoSpark" x1="0" y1="0" x2="0" y2="1">
+                  <stop stopColor="var(--green)" />
+                  <stop offset="1" stopColor="var(--green)" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </article>
+
+          <article className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--panel)] p-6 lg:col-span-3">
+            <p className="font-['DM_Mono',monospace] text-[10px] tracking-[0.16em] text-[color:var(--orange)] uppercase">
+              Vault
             </p>
-            <div className="mt-6 flex h-20 items-end gap-2">
-              {[40, 65, 45, 80, 60, 95, 70].map((height, index) => (
-                <div
-                  key={'bar-' + index}
-                  className="flex-1 rounded-full bg-gradient-to-t from-[color:var(--blue)] to-[color:var(--purple)]"
-                  style={{ height: height + '%', opacity: 0.35 + height / 200 }}
-                />
+            <h3 className="mt-2 text-lg font-semibold text-[color:var(--text)]">Keys stay named.</h3>
+            <ul className="mt-5 space-y-2 font-['DM_Mono',monospace] text-[11px]">
+              {['SSO · okta', 'Audit · 90d', 'Env · sealed'].map((row) => (
+                <li
+                  key={row}
+                  className="flex items-center justify-between rounded-lg border border-[color:var(--line)] bg-[color:var(--bg)] px-3 py-2 text-[color:var(--muted)]"
+                >
+                  {row}
+                  <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--green)]" />
+                </li>
               ))}
-            </div>
-          </div>
+            </ul>
+          </article>
 
-          <div className="rounded-3xl border border-[color:var(--line)] bg-[color:var(--panel)] p-7">
-            <p className="text-sm font-semibold text-[color:var(--text)]">Security</p>
-            <p className="mt-1.5 text-sm text-[color:var(--muted)]">
-              Encrypted by default, with granular access on every workspace.
-            </p>
-            <div className="mt-6 flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[color:var(--panel-2)]">
-                <Lock size={18} className="text-[color:var(--green)]" />
-              </div>
-              <div className="flex-1 space-y-1.5">
-                <div className="h-1.5 w-full rounded-full bg-[color:var(--panel-2)]" />
-                <div className="h-1.5 w-2/3 rounded-full bg-[color:var(--panel-2)]" />
-              </div>
+          <article className="overflow-hidden rounded-2xl border border-[color:var(--line)] bg-[color:var(--panel)] lg:col-span-4">
+            <div className="flex items-center justify-between border-b border-[color:var(--line)] px-4 py-2.5">
+              <span className="font-['DM_Mono',monospace] text-[10px] text-[color:var(--muted)]">webhook.ts</span>
+              <span className="font-['DM_Mono',monospace] text-[10px] text-[color:var(--green)]">typed</span>
             </div>
-          </div>
-
-          <div className="flex flex-col overflow-hidden rounded-3xl border border-[color:var(--line)] bg-[color:var(--panel)] lg:row-span-2">
-            <div className="p-7 pb-0">
-              <p className="text-sm font-semibold text-[color:var(--text)]">Powerful APIs</p>
-              <p className="mt-1.5 text-sm text-[color:var(--muted)]">
-                Automate any workflow with a typed SDK and predictable webhooks.
-              </p>
-            </div>
-            <div className="mt-6 flex-1 px-7 pb-7">
-              <div className="h-full overflow-hidden rounded-2xl border border-[color:var(--line)] bg-[color:var(--bg)]">
-                <div className="flex items-center gap-1.5 border-b border-[color:var(--line)] px-3 py-2.5">
-                  <span className="h-2 w-2 rounded-full bg-[color:var(--muted)]/40" />
-                  <span className="h-2 w-2 rounded-full bg-[color:var(--muted)]/40" />
-                  <span className="h-2 w-2 rounded-full bg-[color:var(--muted)]/40" />
-                  <span className="ml-2 text-[10px] text-[color:var(--muted)]">webhook.ts</span>
-                </div>
-                <div className="space-y-2 p-4 font-mono text-[11px] leading-relaxed">
-                  <p>
-                    <span className="text-[color:var(--purple)]">const</span>{' '}
-                    <span className="text-[color:var(--text)]">client</span> ={' '}
-                    <span className="text-[color:var(--blue)]">new</span>{' '}
-                    <span className="text-[color:var(--green)]">Prism</span>()
-                  </p>
-                  <p>
-                    <span className="text-[color:var(--text)]">client</span>.
-                    <span className="text-[color:var(--green)]">on</span>(
-                    <span className="text-[color:var(--blue)]">'deploy'</span>, handleDeploy)
-                  </p>
-                  <p className="pl-4 text-[color:var(--muted)]">notify(event.project)</p>
-                </div>
-              </div>
-            </div>
-          </div>
+            <pre className="px-4 py-4 font-['DM_Mono',monospace] text-[11px] leading-6 text-[color:var(--muted)]">
+              <span className="text-[color:var(--purple)]">export</span> const on ={' '}
+              <span className="text-[color:var(--green)]">'deploy'</span>
+              {'\n'}notify(event.<span className="text-[color:var(--text)]">project</span>)
+            </pre>
+          </article>
         </div>
       </div>
     </section>
