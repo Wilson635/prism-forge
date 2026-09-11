@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 148 40" fill="none" role="img" aria-labelledby="prism-logo-title">
+  <title id="prism-logo-title">PRISM</title>
+  <g transform="translate(20 20) scale(1.25)">
+    <g transform="skewY(30) rotate(30)">
+      <rect x="-5" y="-8" width="10" height="16" stroke="#79f2b0" stroke-width="1" />
+    </g>
+    <g transform="skewY(-30) rotate(-30)" opacity="0.65">
+      <rect x="-5" y="-8" width="10" height="16" stroke="#79f2b0" stroke-width="1" />
+    </g>
+    <g transform="rotate(90)" opacity="0.35">
+      <rect x="-5" y="-8" width="10" height="16" stroke="#79f2b0" stroke-width="1" />
+    </g>
+  </g>
+  <text
+    x="42"
+    y="25"
+    fill="#f1f5f2"
+    font-family="Manrope, Arial Black, Arial, sans-serif"
+    font-size="16"
+    font-weight="800"
+    letter-spacing="3.2"
+  >PRISM</text>
+</svg>

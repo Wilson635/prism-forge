@@ -5,7 +5,7 @@ import source from './dashboard-live-command.tsx?raw'
 
 export const block = defineBlock({
   id: "dashboard-live-command",
-  name: "Dashboard — Live command center",
+  name: 'Bento — Live command',
   category: "Bento",
   tone: "blue",
   icon: Gauge,

@@ -5,7 +5,7 @@ import source from './bento-feature-showcase.tsx?raw'
 
 export const block = defineBlock({
   id: 'bento-feature-showcase',
-  name: 'Bento — Feature showcase',
+  name: 'Bento — Feature showcase -1',
   category: 'Bento',
   tone: 'blue',
   icon: Command,

@@ -23,10 +23,12 @@ const stats = [
 
 export default function BentoDeployDashboard() {
   return (
-    <section className="bg-[color:var(--bg)] px-6 py-20 sm:px-10">
+    <section className="bg-[color:var(--bg)] px-6 py-20 font-['Manrope',sans-serif] sm:px-10">
       <div className="mx-auto max-w-6xl">
-        <div className="text-center">
-          <span className="text-xs font-semibold uppercase tracking-wide text-[color:var(--green)]">Deploy faster</span>
+        <div>
+          <p className="font-['DM_Mono',monospace] text-[11px] tracking-[0.18em] text-[color:var(--green)] uppercase">
+            Deploy
+          </p>
           <h2 className="mt-3 text-4xl font-semibold tracking-tight text-[color:var(--text)] sm:text-5xl">
             Everything you need to ship
           </h2>
